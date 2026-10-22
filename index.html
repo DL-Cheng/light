@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>水溶液穿透率量測</title>
+<meta name="theme-color" content="#1f6f5c">
+<meta name="description" content="ESP32 水溶液光穿透率量測即時儀表板">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="穿透率量測">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <img src="icons/icon.svg" alt="" class="logo">
+    <div class="ttl"><h1>水溶液穿透率量測</h1><div class="sub">ESP32 · RGB LED · LDR</div></div>
+    <div class="pills">
+      <span class="pill" id="pBroker"><i class="dot"></i>Broker</span>
+      <span class="pill" id="pDev"><i class="dot"></i>裝置</span>
+    </div>
+  </header>
+
+  <div class="warn" id="lowBanner" hidden>電池電量偏低，請盡快充電。</div>
+
+  <section class="card status">
+    <div class="row between">
+      <div>
+        <div class="lab">量測狀態</div>
+        <div class="state" id="state">等待裝置…</div>
+        <div class="sub" id="srcNote">&nbsp;</div>
+      </div>
+      <div class="bat" id="bat" title="電池">
+        <div class="batico"><i id="batFill"></i></div>
+        <div class="batnum"><b id="batPct">--</b><small id="batMv">未偵測</small></div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step" data-c="R">R 紅</div><div class="step" data-c="G">G 綠</div><div class="step" data-c="B">B 藍</div>
+    </div>
+  </section>
+
+  <section class="chs">
+    <article class="card ch" data-c="R"><div class="cn">R 紅光</div><div class="big" id="tR">—</div><div class="sm">穿透率 T</div><div class="bar"><i id="barR"></i></div><div class="sm" id="aR">A = —</div><div class="sm" id="dR"></div><div class="wn" id="wR"></div></article>
+    <article class="card ch" data-c="G"><div class="cn">G 綠光</div><div class="big" id="tG">—</div><div class="sm">穿透率 T</div><div class="bar"><i id="barG"></i></div><div class="sm" id="aG">A = —</div><div class="sm" id="dG"></div><div class="wn" id="wG"></div></article>
+    <article class="card ch" data-c="B"><div class="cn">B 藍光</div><div class="big" id="tB">—</div><div class="sm">穿透率 T</div><div class="bar"><i id="barB"></i></div><div class="sm" id="aB">A = —</div><div class="sm" id="dB"></div><div class="wn" id="wB"></div></article>
+  </section>
+
+  <section class="card">
+    <div class="lab">吸光度 A 紀錄</div>
+    <canvas id="chart"></canvas>
+    <div class="legend"><span style="color:var(--r)">R</span><span style="color:var(--g)">G</span><span style="color:var(--b)">B</span></div>
+  </section>
+
+  <section class="card">
+    <div class="row between">
+      <div class="lab">量測紀錄</div>
+      <div class="row"><button class="mini" id="bCsv">下載 CSV</button><button class="mini" id="bClear">清除</button></div>
+    </div>
+    <label class="field">樣品標籤（濃度等）<input type="text" id="label" placeholder="例如 5 ppm" autocomplete="off"></label>
+    <div class="scroll">
+      <table id="tbl"><thead><tr><th>#</th><th>時間</th><th>標籤</th><th>T(R)</th><th>T(G)</th><th>T(B)</th><th>A(R)</th><th>A(G)</th><th>A(B)</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="empty" id="empty">尚無資料。先放入純水記錄參考值，再放入樣品量測。</div>
+  </section>
+
+  <section class="card">
+    <div class="lab">連線設定與事件記錄</div>
+    <div class="row wrapx">
+      <input type="text" id="devId" aria-label="裝置 ID" autocomplete="off" autocapitalize="off">
+      <button class="mini" id="bApply">套用並重新連線</button>
+    </div>
+    <div class="sub" id="topicNote"></div>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+
+<nav class="dock" aria-label="控制">
+  <div class="dockin">
+    <button id="bRef" class="btn">1　記錄純水參考<span class="hw" id="ledRef">實體 BTN1</span></button>
+    <button id="bMeas" class="btn primary">2　量測樣品<span class="hw" id="ledMeas">實體 BTN2</span></button>
+  </div>
+</nav>
+
+<script src="vendor/mqtt.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
